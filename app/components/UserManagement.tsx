@@ -37,7 +37,7 @@ export default function UserManagement({ onRefresh }: UserManagementProps) {
       setLoading(true);
       const response = await fetch('/api/admin/users');
       const data = await response.json();
-      
+
       if (response.ok) {
         setUsers(data.users);
       } else {
@@ -165,8 +165,8 @@ export default function UserManagement({ onRefresh }: UserManagementProps) {
   };
 
   const toggleUserSelection = (userId: number) => {
-    setSelectedUsers(prev => 
-      prev.includes(userId) 
+    setSelectedUsers(prev =>
+      prev.includes(userId)
         ? prev.filter(id => id !== userId)
         : [...prev, userId]
     );
@@ -184,14 +184,14 @@ export default function UserManagement({ onRefresh }: UserManagementProps) {
   const filteredUsers = users
     .filter(user => {
       const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           user.email.toLowerCase().includes(searchTerm.toLowerCase());
+        user.email.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesStatus = statusFilter === 'all' || user.status === statusFilter;
       return matchesSearch && matchesStatus;
     })
     .sort((a, b) => {
       const aValue = a[sortBy as keyof User];
       const bValue = b[sortBy as keyof User];
-      
+
       if (sortOrder === 'asc') {
         return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
       } else {
@@ -201,177 +201,261 @@ export default function UserManagement({ onRefresh }: UserManagementProps) {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center p-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500"></div>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '4rem' }}>
+        <div style={{ width: '2rem', height: '2rem', border: '2px solid rgba(102, 126, 234, 0.3)', borderTop: '2px solid #667eea', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header với thống kê */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white/10 rounded-xl p-4 border border-white/20">
-          <h3 className="text-white font-semibold">Tổng Users</h3>
-          <p className="text-2xl font-bold text-purple-300">{users.length}</p>
+    <div>
+      {/* Stats Cards */}
+      <div className="architect-stats-grid">
+        <div className="architect-stat-card">
+          <div className="architect-stat-header">
+            <div>
+              <div className="architect-stat-title">Total Users</div>
+              <div className="architect-stat-value">{users.length}</div>
+              <div className="architect-stat-change positive">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                </svg>
+                All registered users
+              </div>
+            </div>
+            <div className="architect-stat-icon" style={{ background: 'linear-gradient(135deg, #667eea, #764ba2)' }}>
+              <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+              </svg>
+            </div>
+          </div>
         </div>
-        <div className="bg-white/10 rounded-xl p-4 border border-white/20">
-          <h3 className="text-white font-semibold">Đang chờ</h3>
-          <p className="text-2xl font-bold text-yellow-300">
-            {users.filter(u => u.status === 'pending').length}
-          </p>
+
+        <div className="architect-stat-card">
+          <div className="architect-stat-header">
+            <div>
+              <div className="architect-stat-title">Pending Users</div>
+              <div className="architect-stat-value">
+                {users.filter(u => u.status === 'pending').length}
+              </div>
+              <div className="architect-stat-change negative">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Needs approval
+              </div>
+            </div>
+            <div className="architect-stat-icon" style={{ background: 'linear-gradient(135deg, #f59e0b, #d97706)' }}>
+              <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+          </div>
         </div>
-        <div className="bg-white/10 rounded-xl p-4 border border-white/20">
-          <h3 className="text-white font-semibold">Hoạt động</h3>
-          <p className="text-2xl font-bold text-green-300">
-            {users.filter(u => u.status === 'active').length}
-          </p>
+
+        <div className="architect-stat-card">
+          <div className="architect-stat-header">
+            <div>
+              <div className="architect-stat-title">Active Users</div>
+              <div className="architect-stat-value">
+                {users.filter(u => u.status === 'active').length}
+              </div>
+              <div className="architect-stat-change positive">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Verified accounts
+              </div>
+            </div>
+            <div className="architect-stat-icon" style={{ background: 'linear-gradient(135deg, #10b981, #059669)' }}>
+              <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+          </div>
         </div>
-        <div className="bg-white/10 rounded-xl p-4 border border-white/20">
-          <h3 className="text-white font-semibold">Bị khóa</h3>
-          <p className="text-2xl font-bold text-red-300">
-            {users.filter(u => u.status === 'banned').length}
-          </p>
+
+        <div className="architect-stat-card">
+          <div className="architect-stat-header">
+            <div>
+              <div className="architect-stat-title">Banned Users</div>
+              <div className="architect-stat-value">
+                {users.filter(u => u.status === 'banned').length}
+              </div>
+              <div className="architect-stat-change negative">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L18.364 5.636M5.636 18.364l12.728-12.728" />
+                </svg>
+                Suspended accounts
+              </div>
+            </div>
+            <div className="architect-stat-icon" style={{ background: 'linear-gradient(135deg, #ef4444, #dc2626)' }}>
+              <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L18.364 5.636M5.636 18.364l12.728-12.728" />
+              </svg>
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Controls */}
-      <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
-        {/* Search và Filter */}
-        <div className="flex flex-col sm:flex-row gap-4 flex-1">
-          <input
-            type="text"
-            placeholder="Tìm kiếm theo tên hoặc email..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500"
-          />
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-          >
-            <option value="all">Tất cả status</option>
-            <option value="active">Active</option>
-            <option value="pending">Pending</option>
-            <option value="inactive">Inactive</option>
-            <option value="banned">Banned</option>
-          </select>
-          <select
-            value={`${sortBy}-${sortOrder}`}
-            onChange={(e) => {
-              const [field, order] = e.target.value.split('-');
-              setSortBy(field);
-              setSortOrder(order as 'asc' | 'desc');
-            }}
-            className="px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-          >
-            <option value="created_at-desc">Mới nhất</option>
-            <option value="created_at-asc">Cũ nhất</option>
-            <option value="name-asc">Tên A-Z</option>
-            <option value="name-desc">Tên Z-A</option>
-            <option value="email-asc">Email A-Z</option>
-            <option value="email-desc">Email Z-A</option>
-          </select>
+      <div className="architect-chart-card" style={{ marginBottom: '2rem' }}>
+        <div className="architect-chart-header">
+          <h3 className="architect-chart-title">User Management</h3>
+          <div className="architect-chart-actions">
+            {selectedUsers.length > 0 && (
+              <>
+                <button
+                  onClick={() => handleBulkAction('approve')}
+                  className="architect-btn architect-btn-primary"
+                >
+                  <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  Approve ({selectedUsers.length})
+                </button>
+                <button
+                  onClick={() => handleBulkAction('ban')}
+                  className="architect-btn architect-btn-secondary"
+                >
+                  <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L18.364 5.636M5.636 18.364l12.728-12.728" />
+                  </svg>
+                  Ban ({selectedUsers.length})
+                </button>
+                <button
+                  onClick={handleDeleteUsers}
+                  className="architect-btn architect-btn-secondary"
+                  style={{ background: '#ef4444', color: 'white' }}
+                >
+                  <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                  Delete ({selectedUsers.length})
+                </button>
+              </>
+            )}
+          </div>
         </div>
 
-        {/* Bulk Actions */}
-        {selectedUsers.length > 0 && (
-          <div className="flex gap-2">
-            <button
-              onClick={() => handleBulkAction('approve')}
-              className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors"
+        {/* Search and Filters */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <input
+            type="text"
+            placeholder="Search users by name or email..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="architect-input"
+          />
+          <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="architect-select"
+              style={{ flex: 1, minWidth: '150px' }}
             >
-              Duyệt ({selectedUsers.length})
-            </button>
-            <button
-              onClick={() => handleBulkAction('ban')}
-              className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors"
+              <option value="all">All Status</option>
+              <option value="active">Active</option>
+              <option value="pending">Pending</option>
+              <option value="inactive">Inactive</option>
+              <option value="banned">Banned</option>
+            </select>
+            <select
+              value={`${sortBy}-${sortOrder}`}
+              onChange={(e) => {
+                const [field, order] = e.target.value.split('-');
+                setSortBy(field);
+                setSortOrder(order as 'asc' | 'desc');
+              }}
+              className="architect-select"
+              style={{ flex: 1, minWidth: '150px' }}
             >
-              Khóa ({selectedUsers.length})
-            </button>
-            <button
-              onClick={handleDeleteUsers}
-              className="px-4 py-2 bg-red-700 hover:bg-red-800 text-white rounded-lg transition-colors"
-            >
-              Xóa ({selectedUsers.length})
-            </button>
+              <option value="created_at-desc">Newest First</option>
+              <option value="created_at-asc">Oldest First</option>
+              <option value="name-asc">Name A-Z</option>
+              <option value="name-desc">Name Z-A</option>
+              <option value="email-asc">Email A-Z</option>
+              <option value="email-desc">Email Z-A</option>
+            </select>
           </div>
-        )}
+        </div>
       </div>
 
       {/* Users Table */}
-      <div className="overflow-x-auto">
-        <table className="w-full text-white">
+      <div className="architect-table-card">
+        <table className="architect-table">
           <thead>
-            <tr className="border-b border-white/20">
-              <th className="text-left p-4">
+            <tr>
+              <th>
                 <input
                   type="checkbox"
                   checked={selectedUsers.length === filteredUsers.length && filteredUsers.length > 0}
                   onChange={toggleSelectAll}
-                  className="w-4 h-4 text-purple-500 bg-white/10 border-white/20 rounded focus:ring-purple-500 focus:ring-2"
+                  style={{ width: '1rem', height: '1rem' }}
                 />
               </th>
-              <th className="text-left p-4">ID</th>
-              <th className="text-left p-4">Avatar</th>
-              <th className="text-left p-4">Name</th>
-              <th className="text-left p-4">Email</th>
-              <th className="text-left p-4">Status</th>
-              <th className="text-left p-4">Created At</th>
-              <th className="text-left p-4">Actions</th>
+              <th>User</th>
+              <th>Email</th>
+              <th>Status</th>
+              <th>Created</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
             {filteredUsers.map((user) => (
-              <tr key={user.id} className="border-b border-white/10 hover:bg-white/5">
-                <td className="p-4">
+              <tr key={user.id}>
+                <td>
                   <input
                     type="checkbox"
                     checked={selectedUsers.includes(user.id)}
                     onChange={() => toggleUserSelection(user.id)}
-                    className="w-4 h-4 text-purple-500 bg-white/10 border-white/20 rounded focus:ring-purple-500 focus:ring-2"
+                    style={{ width: '1rem', height: '1rem' }}
                   />
                 </td>
-                <td className="p-4">{user.id}</td>
-                <td className="p-4">
-                  <img 
-                    src={user.avatar} 
-                    alt={user.name}
-                    className="w-10 h-10 rounded-full"
-                  />
+                <td>
+                  <div className="architect-user-info">
+                    <img
+                      src={user.avatar || `https://ui-avatars.com/api/?name=${user.name}&background=667eea&color=fff`}
+                      alt={user.name}
+                      className="architect-avatar"
+                    />
+                    <div className="architect-user-details">
+                      <h4>{user.name}</h4>
+                      <p>ID: {user.id}</p>
+                    </div>
+                  </div>
                 </td>
-                <td className="p-4">{user.name}</td>
-                <td className="p-4">{user.email}</td>
-                <td className="p-4">
-                  <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                    user.status === 'active' ? 'bg-green-500/20 text-green-300' :
-                    user.status === 'pending' ? 'bg-yellow-500/20 text-yellow-300' :
-                    user.status === 'inactive' ? 'bg-gray-500/20 text-gray-300' :
-                    'bg-red-500/20 text-red-300'
-                  }`}>
+                <td>{user.email}</td>
+                <td>
+                  <span className={`architect-status architect-status-${user.status}`}>
                     {user.status}
                   </span>
                 </td>
-                <td className="p-4">
-                  {new Date(user.created_at).toLocaleDateString('vi-VN')}
-                </td>
-                <td className="p-4">
-                  <div className="flex gap-2">
+                <td>{new Date(user.created_at).toLocaleDateString('vi-VN')}</td>
+                <td>
+                  <div style={{ display: 'flex', gap: '0.5rem' }}>
                     <button
                       onClick={() => {
                         setEditingUser(user);
                         setShowEditModal(true);
                       }}
-                      className="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded text-sm transition-colors"
+                      className="architect-btn architect-btn-primary"
+                      style={{ padding: '0.25rem 0.75rem', fontSize: '0.8rem' }}
                     >
-                      Sửa
+                      <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                      </svg>
+                      Edit
                     </button>
                     <button
                       onClick={() => handleDeleteUser(user.id)}
-                      className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded text-sm transition-colors"
+                      className="architect-btn architect-btn-secondary"
+                      style={{ padding: '0.25rem 0.75rem', fontSize: '0.8rem', background: '#ef4444', color: 'white' }}
                     >
-                      Xóa
+                      <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                      Delete
                     </button>
                   </div>
                 </td>
@@ -394,8 +478,8 @@ export default function UserManagement({ onRefresh }: UserManagementProps) {
       )}
 
       {error && (
-        <div className="bg-red-500/20 border border-red-500/50 rounded-xl p-4">
-          <p className="text-red-200">{error}</p>
+        <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: '12px', padding: '1rem', marginTop: '1rem' }}>
+          <p style={{ color: '#ef4444' }}>{error}</p>
         </div>
       )}
     </div>
@@ -423,39 +507,39 @@ function EditUserModal({ user, onSave, onClose }: EditUserModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/20 max-w-md w-full mx-4">
-        <h2 className="text-2xl font-bold text-white mb-6">Sửa User</h2>
-        
-        <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="admin-modal">
+      <div className="admin-modal-content">
+        <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#1e293b', marginBottom: '1.5rem' }}>Edit User</h2>
+
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           <div>
-            <label className="block text-white text-sm font-medium mb-2">Tên</label>
+            <label style={{ display: 'block', color: '#64748b', fontSize: '0.9rem', fontWeight: 500, marginBottom: '0.5rem' }}>Name</label>
             <input
               type="text"
               value={formData.name}
               onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-              className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="admin-input"
               required
             />
           </div>
-          
+
           <div>
-            <label className="block text-white text-sm font-medium mb-2">Email</label>
+            <label style={{ display: 'block', color: '#64748b', fontSize: '0.9rem', fontWeight: 500, marginBottom: '0.5rem' }}>Email</label>
             <input
               type="email"
               value={formData.email}
               onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-              className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="admin-input"
               required
             />
           </div>
-          
+
           <div>
-            <label className="block text-white text-sm font-medium mb-2">Status</label>
+            <label style={{ display: 'block', color: '#64748b', fontSize: '0.9rem', fontWeight: 500, marginBottom: '0.5rem' }}>Status</label>
             <select
               value={formData.status}
               onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value }))}
-              className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="admin-select"
             >
               <option value="active">Active</option>
               <option value="pending">Pending</option>
@@ -463,30 +547,32 @@ function EditUserModal({ user, onSave, onClose }: EditUserModalProps) {
               <option value="banned">Banned</option>
             </select>
           </div>
-          
+
           <div>
-            <label className="block text-white text-sm font-medium mb-2">Avatar URL</label>
+            <label style={{ display: 'block', color: '#64748b', fontSize: '0.9rem', fontWeight: 500, marginBottom: '0.5rem' }}>Avatar URL</label>
             <input
               type="url"
               value={formData.avatar}
               onChange={(e) => setFormData(prev => ({ ...prev, avatar: e.target.value }))}
-              className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="admin-input"
             />
           </div>
-          
-          <div className="flex gap-4 pt-4">
+
+          <div style={{ display: 'flex', gap: '1rem', paddingTop: '1rem' }}>
             <button
               type="submit"
-              className="flex-1 px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg transition-colors"
+              className="architect-btn architect-btn-primary"
+              style={{ flex: 1 }}
             >
-              Lưu
+              Save Changes
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-colors"
+              className="architect-btn architect-btn-secondary"
+              style={{ flex: 1 }}
             >
-              Hủy
+              Cancel
             </button>
           </div>
         </form>
